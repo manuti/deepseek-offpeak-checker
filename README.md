@@ -30,7 +30,7 @@ Ambas franjas y la zona horaria son configurables.
 ### Automática (recomendada)
 
 ```bash
-git clone https://github.com/TU-USUARIO/deepseek-offpeak-checker.git
+git clone https://github.com/manuti/deepseek-offpeak-checker.git
 cd deepseek-offpeak-checker
 ./install.sh
 ```
