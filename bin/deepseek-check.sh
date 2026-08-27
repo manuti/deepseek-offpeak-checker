@@ -288,36 +288,32 @@ if [ "$AUTO_CHECK" = 1 ]; then
             TMP_HDR="$tmp/headers.txt"
             if code=$(fetch_policy "$POLICY_URL" 2>/dev/null); then
                 update_cache "$TMP_HTML" "$TMP_HDR" "$code"
-                POLICY_NOTE="Política: comprobada ahora"
+                POLICY_NOTE="actualizada"
             else
-                POLICY_NOTE="Política: sin conexión"
+                POLICY_NOTE="sin conexión"
             fi
             rm -rf "$tmp"
         fi
     fi
 fi
 
-# ── Línea de política para la caja ─────────────────────────────────────
-LINE_3=""
+# ── Sufijo de política para la línea de estado ────────────────────────
+POL_SUFFIX=""
 if [ -n "$POLICY_NOTE" ]; then
-    LINE_3="$POLICY_NOTE"
+    POL_SUFFIX=" · $POLICY_NOTE"
 else
     iso=$(cache_get checked_iso)
     if [ -n "$iso" ]; then
         epoch=$(cache_get checked_epoch)
+        stale=""
         if [ -n "$epoch" ]; then
             age=$(( ( $(date +%s) - epoch ) / 86400 ))
-            if [ "$age" -ge "$AUTO_CHECK_TTL_DAYS" ]; then
-                LINE_3="Política: desactualizada (usa -update)"
-            else
-                if [ "$age" -ge 1 ]; then
-                    LINE_3="Política: ${iso%% *} (hace ${age}d)"
-                else
-                    LINE_3="Política: ${iso%% *}"
-                fi
-            fi
+            [ "$age" -ge "$AUTO_CHECK_TTL_DAYS" ] && stale=1
+        fi
+        if [ "$stale" = 1 ]; then
+            POL_SUFFIX=" · desactualizada"
         else
-            LINE_3="Política: ${iso%% *}"
+            POL_SUFFIX=" · ${iso%% *}"
         fi
     fi
 fi
@@ -348,14 +344,20 @@ fi
 
 # Caja de ancho fijo: 46 columnas
 BORDER="$(printf '═%.0s' {1..44})"
-LINE_1="DeepSeek: $STATUS"
+LINE_1="DeepSeek: $STATUS$POL_SUFFIX"
+# Si el sufijo de política no cabe (p. ej. en fin de semana), se omite sin deformar la caja
+if [ "${#LINE_1}" -gt 37 ]; then
+    LINE_1="DeepSeek: $STATUS"
+fi
 LINE_2="Pico: $(printf '%02d' "$PEAK_START_MORNING"):00-$(printf '%02d' "$PEAK_END_MORNING"):00 y $(printf '%02d' "$PEAK_START_AFTERNOON"):00-$(printf '%02d' "$PEAK_END_AFTERNOON"):00 BJT"
+LOCAL_TIME=$(date +%H:%M 2>/dev/null)
 
 printf '%b%s%b\n' "$COLOR" "╔${BORDER}╗" "$RESET"
 printf '%b║  %s %-37s  ║%b\n' "$COLOR" "$EMOJI" "$LINE_1" "$RESET"
 printf '%b║  %-40s  ║%b\n' "$COLOR" "$LINE_2" "$RESET"
-if [ -n "$LINE_3" ]; then
-    printf '%b║  %-40s  ║%b\n' "$COLOR" "$LINE_3" "$RESET"
+if [ -n "$LOCAL_TIME" ]; then
+    # Hora local del dispositivo, siempre en color estándar del terminal
+    printf '║  %-40s  ║\n' "Hora local: $LOCAL_TIME"
 fi
 printf '%b%s%b\n' "$COLOR" "╚${BORDER}╝" "$RESET"
 

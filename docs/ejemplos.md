@@ -7,6 +7,7 @@ $ deepseek-check
 ╔════════════════════════════════════════════╗
 ║  🟢 DeepSeek: HORA VALLE                   ║
 ║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
+║  Hora local: 16:45                         ║
 ╚════════════════════════════════════════════╝
 ```
 
@@ -18,6 +19,7 @@ $ deepseek-check
 ╔════════════════════════════════════════════╗
 ║  🔴 DeepSeek: HORA PICO                    ║
 ║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
+║  Hora local: 16:45                         ║
 ╚════════════════════════════════════════════╝
 ```
 
@@ -28,6 +30,7 @@ $ deepseek-check
 ╔════════════════════════════════════════════╗
 ║  🟢 DeepSeek: HORA VALLE (fin de semana)   ║
 ║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
+║  Hora local: 16:45                         ║
 ╚════════════════════════════════════════════╝
 ```
 
@@ -119,14 +122,14 @@ $ deepseek-check -update
    Si la política cambió, actualiza ~/.deepseekrc (o las variables de entorno).
 ```
 
-Con caché presente, la salida normal incluye la fecha de la última comprobación:
+Con caché presente, la línea de estado incluye la fecha de la última comprobación:
 
 ```console
 $ deepseek-check
 ╔════════════════════════════════════════════╗
-║  🟢 DeepSeek: HORA VALLE                   ║
+║  🟢 DeepSeek: HORA VALLE · 2026-08-27     ║
 ║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
-║  Política: 2026-08-27                     ║
+║  Hora local: 16:45                         ║
 ╚════════════════════════════════════════════╝
 ```
 

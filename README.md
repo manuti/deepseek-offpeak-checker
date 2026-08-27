@@ -137,7 +137,7 @@ $ deepseek-check -update
 - Las franjas se convierten de **UTC a tu `TIMEZONE`** automáticamente cuando la página las expresa en UTC.
 - Si la página menciona franjas distintas, el script avisa (devuelve `1`) y tú decides si actualizar `~/.deepseekrc`.
 - La caché (`~/.cache/deepseek-check/policy.info`) guarda URL, fecha de comprobación, `last-modified`, hash del contenido y franjas detectadas. Si el **contenido cambia** entre comprobaciones, también se avisa.
-- Con caché presente, la caja añade una línea con la fecha: `Política: 2026-08-27`, o `Política: desactualizada (usa -update)` cuando lleva más de `AUTO_CHECK_TTL_DAYS` días sin comprobarse.
+- Con caché presente, la línea de estado incluye la fecha de la última comprobación: `DeepSeek: 🟢 HORA VALLE · 2026-08-27` (o `· desactualizada` si la caché lleva más de `AUTO_CHECK_TTL_DAYS` días). En fin de semana el estado es largo y el sufijo se omite para no deformar la caja.
 
 > ⚠️ No existe una API oficial legible por máquina: la extracción de franjas es un heurístico sobre la página de referencia. Si no se encuentran franjas explícitas, confía en la detección de cambios de contenido y revisa la página a mano.
 
@@ -157,10 +157,11 @@ AUTO_CHECK_TTL_DAYS=7
 ╔════════════════════════════════════════════╗
 ║  🟢 DeepSeek: HORA VALLE                   ║
 ║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
+║  Hora local: 16:45                         ║
 ╚════════════════════════════════════════════╝
 ```
 
-Durante el pico la caja se muestra en **rojo** con `🔴 HORA PICO`; los fines de semana siempre es `🟢 HORA VALLE (fin de semana)`. Más ejemplos en [docs/ejemplos.md](docs/ejemplos.md).
+La última línea (`Hora local`) usa la hora del dispositivo y siempre se muestra en el **color estándar** de la terminal. Durante el pico la caja se muestra en **rojo** con `🔴 HORA PICO`; los fines de semana siempre es `🟢 HORA VALLE (fin de semana)`. Más ejemplos en [docs/ejemplos.md](docs/ejemplos.md).
 
 ## 🗂️ Estructura del repositorio
 
