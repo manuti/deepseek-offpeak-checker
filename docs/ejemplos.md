@@ -94,6 +94,50 @@ NO_COLOR=1 deepseek-check
 deepseek-check | cat          # los colores se desactivan solos si no es TTY
 ```
 
+## Comprobación de la política (deepseek-check -update)
+
+Comprueba en línea si las franjas de la página de referencia siguen coincidiendo con tu configuración (convirtiendo de UTC a tu `TIMEZONE` si hace falta):
+
+```console
+$ deepseek-check -update
+📥 Comprobando política en https://deepakness.com/deepseek ...
+✓ Descargado (HTTP 200)
+📄 Franjas mencionadas en la página: 01:00–04:00 and 06:00–10:00 (UTC) = 09:00-12:00 y 14:00-18:00 en Asia/Shanghai
+✓ Coinciden con tu configuración actual (09:00-12:00 y 14:00-18:00)
+✓ El contenido no cambió desde la última comprobación.
+✓ Caché guardada en ~/.cache/deepseek-check/policy.info
+```
+
+Si la página menciona franjas distintas, avisa y devuelve código `1`:
+
+```console
+$ deepseek-check -update
+📥 Comprobando política en https://deepakness.com/deepseek ...
+✓ Descargado (HTTP 200)
+📄 Franjas mencionadas en la página: 10:00-13:00 and 15:00-19:00
+⚠️  Difieren de tu configuración actual (09:00-12:00 y 14:00-18:00)
+   Si la política cambió, actualiza ~/.deepseekrc (o las variables de entorno).
+```
+
+Con caché presente, la salida normal incluye la fecha de la última comprobación:
+
+```console
+$ deepseek-check
+╔════════════════════════════════════════════╗
+║  🟢 DeepSeek: HORA VALLE                   ║
+║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
+║  Política: 2026-08-27                     ║
+╚════════════════════════════════════════════╝
+```
+
+Para actualizar cada 7 días sin intervención, activa el auto-check:
+
+```bash
+# ~/.deepseekrc
+AUTO_CHECK=1
+AUTO_CHECK_TTL_DAYS=7
+```
+
 ## Ejecutar al inicio (hook del instalador)
 
 `install.sh` añade una línea `deepseek-check` a tu `.bashrc` / `.zshrc`, de

@@ -8,6 +8,7 @@ Script ligero para **GNU/Linux y Termux** que indica si estás en **horas valle*
 - **Compatible con Termux** (Android) y cualquier distro GNU/Linux.
 - **Configurable**: horarios pico y zona horaria ajustables con variables de entorno o el archivo `~/.deepseekrc`.
 - **Integrable**: códigos de salida (`0` = valle, `1` = pico, `2` = error) para usarlo con alias, scripts o cron.
+- **Comprobación de política**: `deepseek-check -update` descarga la página de referencia, detecta cambios de contenido y avisa si las franjas difieren de tu configuración; comprobación automática opcional (`AUTO_CHECK`).
 - **Aviso automático** al abrir la terminal (hook opcional que añade `install.sh`).
 - **Colores automáticos**: se desactivan al redirigir la salida o con `NO_COLOR`.
 
@@ -57,6 +58,7 @@ install -m 755 bin/deepseek-check.sh ~/.local/bin/deepseek-check
 | `deepseek-check` | Muestra el estado en una caja de colores |
 | `deepseek-check --quiet` | Sin salida; solo código de salida |
 | `deepseek-check --raw` | Solo código de salida (para scripts) |
+| `deepseek-check -update` | Comprueba en línea la política y guarda la fecha de comprobación |
 | `deepseek-check --help` | Muestra la ayuda |
 
 ### Códigos de salida
@@ -64,6 +66,8 @@ install -m 755 bin/deepseek-check.sh ~/.local/bin/deepseek-check
 - `0` → hora **valle**
 - `1` → hora **pico**
 - `2` → error (configuración inválida, argumento desconocido, `date` falló…)
+
+Con `-update`: `0` = comprobada y coincide · `1` = cambios detectados · `2` = error.
 
 Esto permite integrarlo con otros comandos:
 
@@ -103,6 +107,10 @@ NO_COLOR=1
 | `PEAK_END_AFTERNOON` | Fin del pico de tarde | `18` |
 | `TIMEZONE` | Zona horaria de referencia | `Asia/Shanghai` |
 | `NO_COLOR` | Cualquier valor desactiva el color | — |
+| `POLICY_URL` | URL de la política a comprobar | `https://deepakness.com/deepseek` |
+| `AUTO_CHECK` | Comprobar en línea si la caché caduca (`1` = activado) | `0` |
+| `AUTO_CHECK_TTL_DAYS` | Validez de la caché en días | `7` |
+| `CACHE_DIR` | Directorio de la caché | `~/.cache/deepseek-check` |
 
 También puedes usar variables de entorno directamente:
 
@@ -111,6 +119,37 @@ PEAK_START_MORNING=10 PEAK_END_MORNING=13 deepseek-check
 ```
 
 > Nota: si cambias `TIMEZONE`, las franjas pico se interpretan en esa zona.
+
+## 🌐 Comprobación de la política
+
+Las franjas pico pueden cambiar si DeepSeek actualiza su política. `deepseek-check -update` descarga la página de referencia, guarda la fecha de comprobación y avisa si las franjas mencionadas difieren de tu configuración:
+
+```console
+$ deepseek-check -update
+📥 Comprobando política en https://deepakness.com/deepseek ...
+✓ Descargado (HTTP 200)
+📄 Franjas mencionadas en la página: 01:00–04:00 and 06:00–10:00 (UTC) = 09:00-12:00 y 14:00-18:00 en Asia/Shanghai
+✓ Coinciden con tu configuración actual (09:00-12:00 y 14:00-18:00)
+✓ El contenido no cambió desde la última comprobación.
+✓ Caché guardada en ~/.cache/deepseek-check/policy.info
+```
+
+- Las franjas se convierten de **UTC a tu `TIMEZONE`** automáticamente cuando la página las expresa en UTC.
+- Si la página menciona franjas distintas, el script avisa (devuelve `1`) y tú decides si actualizar `~/.deepseekrc`.
+- La caché (`~/.cache/deepseek-check/policy.info`) guarda URL, fecha de comprobación, `last-modified`, hash del contenido y franjas detectadas. Si el **contenido cambia** entre comprobaciones, también se avisa.
+- Con caché presente, la caja añade una línea con la fecha: `Política: 2026-08-27`, o `Política: desactualizada (usa -update)` cuando lleva más de `AUTO_CHECK_TTL_DAYS` días sin comprobarse.
+
+> ⚠️ No existe una API oficial legible por máquina: la extracción de franjas es un heurístico sobre la página de referencia. Si no se encuentran franjas explícitas, confía en la detección de cambios de contenido y revisa la página a mano.
+
+### Comprobación automática (opcional)
+
+`AUTO_CHECK=1` comprueba en línea cuando la caché supera `AUTO_CHECK_TTL_DAYS` días. Está desactivada por defecto para que el aviso al abrir la terminal siga siendo instantáneo:
+
+```bash
+# en ~/.deepseekrc
+AUTO_CHECK=1
+AUTO_CHECK_TTL_DAYS=7
+```
 
 ## 📄 Ejemplo de salida
 
