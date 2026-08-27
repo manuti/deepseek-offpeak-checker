@@ -17,8 +17,7 @@
 #   TIMEZONE               Zona horaria de referencia              (Asia/Shanghai)
 #   NO_COLOR               Cualquier valor desactiva el color
 #   POLICY_URL             URL de la política a comprobar          (https://deepakness.com/deepseek)
-#   AUTO_CHECK             Comprobar en línea si la caché caduca    (0 = desactivado)
-#   AUTO_CHECK_TTL_DAYS    Días de validez de la caché              (7)
+#   AUTO_CHECK_TTL_DAYS    Días de validez de la caché              (7; se refresca en segundo plano)
 #   CACHE_DIR              Directorio de la caché                   (~/.cache/deepseek-check)
 #
 # Códigos de salida: 0 = valle · 1 = pico · 2 = error
@@ -26,6 +25,9 @@
 # Inspirado en https://deepakness.com/deepseek
 
 set -u
+
+# Ruta absoluta del propio script (para el refresco en segundo plano)
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 
 # ── Carga de configuración ─────────────────────────────────────────────
 CONFIG_FILE="${DEEPSEEK_RC:-$HOME/.deepseekrc}"
@@ -41,7 +43,6 @@ fi
 : "${PEAK_END_AFTERNOON:=18}"
 : "${TIMEZONE:=Asia/Shanghai}"
 : "${POLICY_URL:=https://deepakness.com/deepseek}"
-: "${AUTO_CHECK:=0}"
 : "${AUTO_CHECK_TTL_DAYS:=7}"
 : "${CACHE_DIR:=$HOME/.cache/deepseek-check}"
 CACHE_FILE="$CACHE_DIR/policy.info"
@@ -54,7 +55,7 @@ for v in PEAK_START_MORNING PEAK_END_MORNING PEAK_START_AFTERNOON PEAK_END_AFTER
         exit 2
     fi
 done
-if [ "$AUTO_CHECK" = 1 ] && { ! [[ "$AUTO_CHECK_TTL_DAYS" =~ ^[0-9]+$ ]] || [ "$AUTO_CHECK_TTL_DAYS" -lt 1 ]; }; then
+if ! [[ "$AUTO_CHECK_TTL_DAYS" =~ ^[0-9]+$ ]] || [ "$AUTO_CHECK_TTL_DAYS" -lt 1 ]; then
     echo "deepseek-check: AUTO_CHECK_TTL_DAYS='$AUTO_CHECK_TTL_DAYS' no es válido (debe ser >= 1)" >&2
     exit 2
 fi
@@ -145,8 +146,7 @@ Configuración (variables de entorno o ~/.deepseekrc):
   TIMEZONE                Zona horaria de referencia   (Asia/Shanghai)
   NO_COLOR                Cualquier valor desactiva el color
   POLICY_URL              URL de la política           (https://deepakness.com/deepseek)
-  AUTO_CHECK              Comprobar si la caché caduca  (0 = desactivado)
-  AUTO_CHECK_TTL_DAYS     Validez de la caché en días   (7)
+  AUTO_CHECK_TTL_DAYS     Validez de la caché en días   (7; refresco en segundo plano)
   CACHE_DIR               Directorio de la caché        (~/.cache/deepseek-check)
 
 Códigos de salida: 0 = valle · 1 = pico · 2 = error
@@ -272,50 +272,18 @@ if [ "$MODE" = "quiet" ]; then
     exit "$IS_PEAK"
 fi
 
-# ── Comprobación automática de la política (opcional) ──────────────────
-POLICY_NOTE=""
-if [ "$AUTO_CHECK" = 1 ]; then
-    last_epoch=$(cache_get checked_epoch)
-    stale=1
-    if [ -n "$last_epoch" ]; then
-        age=$(( ( $(date +%s) - last_epoch ) / 86400 ))
-        [ "$age" -lt "$AUTO_CHECK_TTL_DAYS" ] && stale=0
-    fi
-    if [ "$stale" = 1 ]; then
-        tmp=$(mktemp -d 2>/dev/null) || tmp=""
-        if [ -n "$tmp" ]; then
-            TMP_HTML="$tmp/policy.html"
-            TMP_HDR="$tmp/headers.txt"
-            if code=$(fetch_policy "$POLICY_URL" 2>/dev/null); then
-                update_cache "$TMP_HTML" "$TMP_HDR" "$code"
-                POLICY_NOTE="actualizada"
-            else
-                POLICY_NOTE="sin conexión"
-            fi
-            rm -rf "$tmp"
-        fi
-    fi
+# ── Actualización de política en segundo plano (si la caché caducó) ───
+last_epoch=$(cache_get checked_epoch)
+stale=1
+if [ -n "$last_epoch" ]; then
+    age=$(( ( $(date +%s) - last_epoch ) / 86400 ))
+    [ "$age" -lt "$AUTO_CHECK_TTL_DAYS" ] && stale=0
 fi
-
-# ── Sufijo de política para la línea de estado ────────────────────────
-POL_SUFFIX=""
-if [ -n "$POLICY_NOTE" ]; then
-    POL_SUFFIX=" · $POLICY_NOTE"
-else
-    iso=$(cache_get checked_iso)
-    if [ -n "$iso" ]; then
-        epoch=$(cache_get checked_epoch)
-        stale=""
-        if [ -n "$epoch" ]; then
-            age=$(( ( $(date +%s) - epoch ) / 86400 ))
-            [ "$age" -ge "$AUTO_CHECK_TTL_DAYS" ] && stale=1
-        fi
-        if [ "$stale" = 1 ]; then
-            POL_SUFFIX=" · desactualizada"
-        else
-            POL_SUFFIX=" · ${iso%% *}"
-        fi
-    fi
+if [ "$stale" = 1 ]; then
+    # Refresco silencioso en segundo plano: no bloquea la terminal ni muestra nada.
+    # Se lanza con el intérprete actual ("$BASH") para no depender del shebang
+    # (en Termux sin termux-exec el shebang portátil no funciona).
+    ( "$BASH" "$SCRIPT_PATH" -update >/dev/null 2>&1 </dev/null & )
 fi
 
 # ── Salida formateada ──────────────────────────────────────────────────
@@ -344,21 +312,12 @@ fi
 
 # Caja de ancho fijo: 46 columnas
 BORDER="$(printf '═%.0s' {1..44})"
-LINE_1="DeepSeek: $STATUS$POL_SUFFIX"
-# Si el sufijo de política no cabe (p. ej. en fin de semana), se omite sin deformar la caja
-if [ "${#LINE_1}" -gt 37 ]; then
-    LINE_1="DeepSeek: $STATUS"
-fi
+LINE_1="DeepSeek: $STATUS"
 LINE_2="Pico: $(printf '%02d' "$PEAK_START_MORNING"):00-$(printf '%02d' "$PEAK_END_MORNING"):00 y $(printf '%02d' "$PEAK_START_AFTERNOON"):00-$(printf '%02d' "$PEAK_END_AFTERNOON"):00 BJT"
-LOCAL_TIME=$(date +%H:%M 2>/dev/null)
 
 printf '%b%s%b\n' "$COLOR" "╔${BORDER}╗" "$RESET"
 printf '%b║  %s %-37s  ║%b\n' "$COLOR" "$EMOJI" "$LINE_1" "$RESET"
 printf '%b║  %-40s  ║%b\n' "$COLOR" "$LINE_2" "$RESET"
-if [ -n "$LOCAL_TIME" ]; then
-    # Hora local del dispositivo, siempre en color estándar del terminal
-    printf '║  %-40s  ║\n' "Hora local: $LOCAL_TIME"
-fi
 printf '%b%s%b\n' "$COLOR" "╚${BORDER}╝" "$RESET"
 
 exit "$IS_PEAK"

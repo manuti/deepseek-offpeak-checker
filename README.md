@@ -108,8 +108,7 @@ NO_COLOR=1
 | `TIMEZONE` | Zona horaria de referencia | `Asia/Shanghai` |
 | `NO_COLOR` | Cualquier valor desactiva el color | — |
 | `POLICY_URL` | URL de la política a comprobar | `https://deepakness.com/deepseek` |
-| `AUTO_CHECK` | Comprobar en línea si la caché caduca (`1` = activado) | `0` |
-| `AUTO_CHECK_TTL_DAYS` | Validez de la caché en días | `7` |
+| `AUTO_CHECK_TTL_DAYS` | Validez de la caché en días (refresco en segundo plano) | `7` |
 | `CACHE_DIR` | Directorio de la caché | `~/.cache/deepseek-check` |
 
 También puedes usar variables de entorno directamente:
@@ -137,17 +136,16 @@ $ deepseek-check -update
 - Las franjas se convierten de **UTC a tu `TIMEZONE`** automáticamente cuando la página las expresa en UTC.
 - Si la página menciona franjas distintas, el script avisa (devuelve `1`) y tú decides si actualizar `~/.deepseekrc`.
 - La caché (`~/.cache/deepseek-check/policy.info`) guarda URL, fecha de comprobación, `last-modified`, hash del contenido y franjas detectadas. Si el **contenido cambia** entre comprobaciones, también se avisa.
-- Con caché presente, la línea de estado incluye la fecha de la última comprobación: `DeepSeek: 🟢 HORA VALLE · 2026-08-27` (o `· desactualizada` si la caché lleva más de `AUTO_CHECK_TTL_DAYS` días). En fin de semana el estado es largo y el sufijo se omite para no deformar la caja.
+- La caché se **actualiza sola en segundo plano** cuando lleva más de `AUTO_CHECK_TTL_DAYS` días (7 por defecto): al ejecutar `deepseek-check`, si la caché está caducada se lanza una comprobación silenciosa que no bloquea la terminal ni muestra nada en pantalla.
 
 > ⚠️ No existe una API oficial legible por máquina: la extracción de franjas es un heurístico sobre la página de referencia. Si no se encuentran franjas explícitas, confía en la detección de cambios de contenido y revisa la página a mano.
 
-### Comprobación automática (opcional)
+### Actualización automática en segundo plano
 
-`AUTO_CHECK=1` comprueba en línea cuando la caché supera `AUTO_CHECK_TTL_DAYS` días. Está desactivada por defecto para que el aviso al abrir la terminal siga siendo instantáneo:
+Si la caché lleva más de `AUTO_CHECK_TTL_DAYS` días (7 por defecto), la siguiente ejecución de `deepseek-check` lanza una comprobación silenciosa en segundo plano: la terminal no se bloquea y no se muestra nada en pantalla. Para ajustar el periodo:
 
 ```bash
 # en ~/.deepseekrc
-AUTO_CHECK=1
 AUTO_CHECK_TTL_DAYS=7
 ```
 
@@ -157,11 +155,10 @@ AUTO_CHECK_TTL_DAYS=7
 ╔════════════════════════════════════════════╗
 ║  🟢 DeepSeek: HORA VALLE                   ║
 ║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
-║  Hora local: 16:45                         ║
 ╚════════════════════════════════════════════╝
 ```
 
-La última línea (`Hora local`) usa la hora del dispositivo y siempre se muestra en el **color estándar** de la terminal. Durante el pico la caja se muestra en **rojo** con `🔴 HORA PICO`; los fines de semana siempre es `🟢 HORA VALLE (fin de semana)`. Más ejemplos en [docs/ejemplos.md](docs/ejemplos.md).
+Durante el pico la caja se muestra en **rojo** con `🔴 HORA PICO`; los fines de semana siempre es `🟢 HORA VALLE (fin de semana)`. Más ejemplos en [docs/ejemplos.md](docs/ejemplos.md).
 
 ## 🗂️ Estructura del repositorio
 

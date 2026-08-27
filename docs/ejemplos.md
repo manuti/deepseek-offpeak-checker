@@ -7,7 +7,6 @@ $ deepseek-check
 ╔════════════════════════════════════════════╗
 ║  🟢 DeepSeek: HORA VALLE                   ║
 ║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
-║  Hora local: 16:45                         ║
 ╚════════════════════════════════════════════╝
 ```
 
@@ -19,7 +18,6 @@ $ deepseek-check
 ╔════════════════════════════════════════════╗
 ║  🔴 DeepSeek: HORA PICO                    ║
 ║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
-║  Hora local: 16:45                         ║
 ╚════════════════════════════════════════════╝
 ```
 
@@ -30,7 +28,6 @@ $ deepseek-check
 ╔════════════════════════════════════════════╗
 ║  🟢 DeepSeek: HORA VALLE (fin de semana)   ║
 ║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
-║  Hora local: 16:45                         ║
 ╚════════════════════════════════════════════╝
 ```
 
@@ -122,22 +119,10 @@ $ deepseek-check -update
    Si la política cambió, actualiza ~/.deepseekrc (o las variables de entorno).
 ```
 
-Con caché presente, la línea de estado incluye la fecha de la última comprobación:
-
-```console
-$ deepseek-check
-╔════════════════════════════════════════════╗
-║  🟢 DeepSeek: HORA VALLE · 2026-08-27     ║
-║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
-║  Hora local: 16:45                         ║
-╚════════════════════════════════════════════╝
-```
-
-Para actualizar cada 7 días sin intervención, activa el auto-check:
+Si la caché lleva más de `AUTO_CHECK_TTL_DAYS` días (7 por defecto), la siguiente ejecución de `deepseek-check` lanza una comprobación **silenciosa en segundo plano**: la terminal no se bloquea ni se muestra nada en pantalla. Para ajustar el periodo:
 
 ```bash
 # ~/.deepseekrc
-AUTO_CHECK=1
 AUTO_CHECK_TTL_DAYS=7
 ```
 
