@@ -4,10 +4,10 @@
 
 ```console
 $ deepseek-check
-╔════════════════════════════════════════════╗
-║  🟢 DeepSeek: HORA VALLE                   ║
-║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
-╚════════════════════════════════════════════╝
+╔═══════════════════════════════════════╗
+║  🟢 DeepSeek: HORA VALLE              ║
+║  Pico: 09:00-12:00 y 14:00-18:00 BJT  ║
+╚═══════════════════════════════════════╝
 ```
 
 En hora pico (de lunes a viernes, 09:00-12:00 o 14:00-18:00 hora de
@@ -15,20 +15,20 @@ Beijing) la caja se muestra en rojo:
 
 ```console
 $ deepseek-check
-╔════════════════════════════════════════════╗
-║  🔴 DeepSeek: HORA PICO                    ║
-║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
-╚════════════════════════════════════════════╝
+╔═══════════════════════════════════════╗
+║  🔴 DeepSeek: HORA PICO               ║
+║  Pico: 09:00-12:00 y 14:00-18:00 BJT  ║
+╚═══════════════════════════════════════╝
 ```
 
 Los fines de semana siempre es hora valle:
 
 ```console
 $ deepseek-check
-╔════════════════════════════════════════════╗
-║  🟢 DeepSeek: HORA VALLE (fin de semana)   ║
-║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
-╚════════════════════════════════════════════╝
+╔═══════════════════════════════════════════╗
+║  🟢 DeepSeek: HORA VALLE (fin de semana)  ║
+║  Pico: 09:00-12:00 y 14:00-18:00 BJT      ║
+╚═══════════════════════════════════════════╝
 ```
 
 ## Códigos de salida (integración con scripts)

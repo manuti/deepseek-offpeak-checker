@@ -107,6 +107,7 @@ NO_COLOR=1
 | `PEAK_END_AFTERNOON` | Fin del pico de tarde | `18` |
 | `TIMEZONE` | Zona horaria de referencia | `Asia/Shanghai` |
 | `NO_COLOR` | Cualquier valor desactiva el color | — |
+| `UI_LANG` | Idioma de la salida (`en`, `fr`, `pt`, `es`) | auto (locale) · `en` por defecto |
 | `POLICY_URL` | URL de la política a comprobar | `https://api-docs.deepseek.com/quick_start/pricing/` |
 | `AUTO_CHECK_TTL_DAYS` | Validez de la caché en días (refresco en segundo plano) | `7` |
 | `CACHE_DIR` | Directorio de la caché | `~/.cache/deepseek-check` |
@@ -149,13 +150,34 @@ Si la caché lleva más de `AUTO_CHECK_TTL_DAYS` días (7 por defecto), la sigui
 AUTO_CHECK_TTL_DAYS=7
 ```
 
+## 🌍 Idiomas
+
+La salida se traduce automáticamente según el locale del sistema (`LC_ALL` > `LC_MESSAGES` > `LANG`): `es`, `fr`, `pt` y `en`. Si el idioma local no está soportado, se usa **inglés** por defecto.
+
+```console
+$ LANG=en_US.UTF-8 deepseek-check
+╔═════════════════════════════════════════╗
+║  🟢 DeepSeek: OFF-PEAK                  ║
+║  Peak: 09:00-12:00 and 14:00-18:00 BJT  ║
+╚═════════════════════════════════════════╝
+```
+
+Para forzar un idioma, usa `UI_LANG` en `~/.deepseekrc` (o como variable de entorno):
+
+```bash
+# ~/.deepseekrc
+UI_LANG=es
+```
+
+La caja ajusta su ancho automáticamente al texto traducido, así que ninguna lengua la deforma.
+
 ## 📄 Ejemplo de salida
 
 ```
-╔════════════════════════════════════════════╗
-║  🟢 DeepSeek: HORA VALLE                   ║
-║  Pico: 09:00-12:00 y 14:00-18:00 BJT       ║
-╚════════════════════════════════════════════╝
+╔═══════════════════════════════════════╗
+║  🟢 DeepSeek: HORA VALLE              ║
+║  Pico: 09:00-12:00 y 14:00-18:00 BJT  ║
+╚═══════════════════════════════════════╝
 ```
 
 Durante el pico la caja se muestra en **rojo** con `🔴 HORA PICO`; los fines de semana siempre es `🟢 HORA VALLE (fin de semana)`. Más ejemplos en [docs/ejemplos.md](docs/ejemplos.md).
