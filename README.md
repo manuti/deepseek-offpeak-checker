@@ -107,7 +107,7 @@ NO_COLOR=1
 | `PEAK_END_AFTERNOON` | Fin del pico de tarde | `18` |
 | `TIMEZONE` | Zona horaria de referencia | `Asia/Shanghai` |
 | `NO_COLOR` | Cualquier valor desactiva el color | — |
-| `POLICY_URL` | URL de la política a comprobar | `https://deepakness.com/deepseek` |
+| `POLICY_URL` | URL de la política a comprobar | `https://api-docs.deepseek.com/quick_start/pricing/` |
 | `AUTO_CHECK_TTL_DAYS` | Validez de la caché en días (refresco en segundo plano) | `7` |
 | `CACHE_DIR` | Directorio de la caché | `~/.cache/deepseek-check` |
 
@@ -121,13 +121,13 @@ PEAK_START_MORNING=10 PEAK_END_MORNING=13 deepseek-check
 
 ## 🌐 Comprobación de la política
 
-Las franjas pico pueden cambiar si DeepSeek actualiza su política. `deepseek-check -update` descarga la página de referencia, guarda la fecha de comprobación y avisa si las franjas mencionadas difieren de tu configuración:
+Las franjas pico pueden cambiar si DeepSeek actualiza su política. `deepseek-check -update` descarga la **página oficial de precios** (configurable con `POLICY_URL`), guarda la fecha de comprobación y avisa si las franjas mencionadas difieren de tu configuración:
 
 ```console
 $ deepseek-check -update
-📥 Comprobando política en https://deepakness.com/deepseek ...
-✓ Descargado (HTTP 200)
-📄 Franjas mencionadas en la página: 01:00–04:00 and 06:00–10:00 (UTC) = 09:00-12:00 y 14:00-18:00 en Asia/Shanghai
+📥 Comprobando política en https://api-docs.deepseek.com/quick_start/pricing/ ...
+✓ Descargado (HTTP 200) · last-modified: Thu, 27 Aug 2026 10:15:37 GMT
+📄 Franjas mencionadas en la página: 01:00 - 04:00 and 06:00 - 10:00 (UTC) = 09:00-12:00 y 14:00-18:00 en Asia/Shanghai
 ✓ Coinciden con tu configuración actual (09:00-12:00 y 14:00-18:00)
 ✓ El contenido no cambió desde la última comprobación.
 ✓ Caché guardada en ~/.cache/deepseek-check/policy.info
@@ -138,7 +138,7 @@ $ deepseek-check -update
 - La caché (`~/.cache/deepseek-check/policy.info`) guarda URL, fecha de comprobación, `last-modified`, hash del contenido y franjas detectadas. Si el **contenido cambia** entre comprobaciones, también se avisa.
 - La caché se **actualiza sola en segundo plano** cuando lleva más de `AUTO_CHECK_TTL_DAYS` días (7 por defecto): al ejecutar `deepseek-check`, si la caché está caducada se lanza una comprobación silenciosa que no bloquea la terminal ni muestra nada en pantalla.
 
-> ⚠️ No existe una API oficial legible por máquina: la extracción de franjas es un heurístico sobre la página de referencia. Si no se encuentran franjas explícitas, confía en la detección de cambios de contenido y revisa la página a mano.
+> ⚠️ La página oficial de precios no ofrece una API legible por máquina: la extracción de franjas es un heurístico sobre el HTML. Si no se encuentran franjas explícitas, confía en la detección de cambios de contenido y revisa la página a mano.
 
 ### Actualización automática en segundo plano
 
@@ -181,7 +181,8 @@ deepseek-offpeak-checker/
 
 ## 🔗 Referencia
 
-Inspirado en el artículo sobre el uso en horas valle de las APIs de DeepSeek: <https://deepakness.com/deepseek>
+- Página oficial de precios de DeepSeek: <https://api-docs.deepseek.com/quick_start/pricing/>
+- Artículo sobre el uso en horas valle (inspiración): <https://deepakness.com/deepseek>
 
 ## 📝 Licencia
 

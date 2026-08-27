@@ -96,13 +96,13 @@ deepseek-check | cat          # los colores se desactivan solos si no es TTY
 
 ## Comprobación de la política (deepseek-check -update)
 
-Comprueba en línea si las franjas de la página de referencia siguen coincidiendo con tu configuración (convirtiendo de UTC a tu `TIMEZONE` si hace falta):
+Comprueba en línea si las franjas de la **página oficial de precios** siguen coincidiendo con tu configuración (convirtiendo de UTC a tu `TIMEZONE` si hace falta):
 
 ```console
 $ deepseek-check -update
-📥 Comprobando política en https://deepakness.com/deepseek ...
-✓ Descargado (HTTP 200)
-📄 Franjas mencionadas en la página: 01:00–04:00 and 06:00–10:00 (UTC) = 09:00-12:00 y 14:00-18:00 en Asia/Shanghai
+📥 Comprobando política en https://api-docs.deepseek.com/quick_start/pricing/ ...
+✓ Descargado (HTTP 200) · last-modified: Thu, 27 Aug 2026 10:15:37 GMT
+📄 Franjas mencionadas en la página: 01:00 - 04:00 and 06:00 - 10:00 (UTC) = 09:00-12:00 y 14:00-18:00 en Asia/Shanghai
 ✓ Coinciden con tu configuración actual (09:00-12:00 y 14:00-18:00)
 ✓ El contenido no cambió desde la última comprobación.
 ✓ Caché guardada en ~/.cache/deepseek-check/policy.info
@@ -112,7 +112,7 @@ Si la página menciona franjas distintas, avisa y devuelve código `1`:
 
 ```console
 $ deepseek-check -update
-📥 Comprobando política en https://deepakness.com/deepseek ...
+📥 Comprobando política en https://api-docs.deepseek.com/quick_start/pricing/ ...
 ✓ Descargado (HTTP 200)
 📄 Franjas mencionadas en la página: 10:00-13:00 and 15:00-19:00
 ⚠️  Difieren de tu configuración actual (09:00-12:00 y 14:00-18:00)

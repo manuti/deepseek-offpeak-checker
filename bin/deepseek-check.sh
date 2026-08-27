@@ -16,7 +16,7 @@
 #   PEAK_END_AFTERNOON     Fin de la franja pico de tarde          (18)
 #   TIMEZONE               Zona horaria de referencia              (Asia/Shanghai)
 #   NO_COLOR               Cualquier valor desactiva el color
-#   POLICY_URL             URL de la política a comprobar          (https://deepakness.com/deepseek)
+#   POLICY_URL             URL de la política a comprobar          (https://api-docs.deepseek.com/quick_start/pricing/)
 #   AUTO_CHECK_TTL_DAYS    Días de validez de la caché              (7; se refresca en segundo plano)
 #   CACHE_DIR              Directorio de la caché                   (~/.cache/deepseek-check)
 #
@@ -42,7 +42,7 @@ fi
 : "${PEAK_START_AFTERNOON:=14}"
 : "${PEAK_END_AFTERNOON:=18}"
 : "${TIMEZONE:=Asia/Shanghai}"
-: "${POLICY_URL:=https://deepakness.com/deepseek}"
+: "${POLICY_URL:=https://api-docs.deepseek.com/quick_start/pricing/}"
 : "${AUTO_CHECK_TTL_DAYS:=7}"
 : "${CACHE_DIR:=$HOME/.cache/deepseek-check}"
 CACHE_FILE="$CACHE_DIR/policy.info"
@@ -145,7 +145,7 @@ Configuración (variables de entorno o ~/.deepseekrc):
   PEAK_END_AFTERNOON      Fin pico de tarde            (18)
   TIMEZONE                Zona horaria de referencia   (Asia/Shanghai)
   NO_COLOR                Cualquier valor desactiva el color
-  POLICY_URL              URL de la política           (https://deepakness.com/deepseek)
+  POLICY_URL              URL de la política           (https://api-docs.deepseek.com/quick_start/pricing/)
   AUTO_CHECK_TTL_DAYS     Validez de la caché en días   (7; refresco en segundo plano)
   CACHE_DIR               Directorio de la caché        (~/.cache/deepseek-check)
 
@@ -189,6 +189,7 @@ if [ "$MODE" = "update" ]; then
     echo "✓ Descargado (HTTP $code)${last_mod:+ · last-modified: $last_mod}"
 
     old_sha=$(cache_get content_sha256)
+    old_url=$(cache_get url)
     current=$(current_windows)
 
     changed=0
@@ -236,7 +237,9 @@ if [ "$MODE" = "update" ]; then
 
     update_cache "$TMP_HTML" "$TMP_HDR" "$code"
     new_sha=$(cache_get content_sha256)
-    if [ -n "$old_sha" ] && [ -n "$new_sha" ] && [ "$old_sha" != "$new_sha" ]; then
+    if [ -n "$old_url" ] && [ "$old_url" != "$POLICY_URL" ]; then
+        echo "ℹ️  Fuente de política cambiada (antes: $old_url)"
+    elif [ -n "$old_sha" ] && [ -n "$new_sha" ] && [ "$old_sha" != "$new_sha" ]; then
         echo "⚠️  El contenido de la página cambió desde la última comprobación."
         changed=1
     elif [ -n "$old_sha" ]; then
