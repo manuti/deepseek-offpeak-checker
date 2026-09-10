@@ -1,4 +1,1 @@
 .codewhale/
-
-# Temporales de trabajo de agentes (Termux: sin /tmp escribible, van al directorio de trabajo)
-codewhale-tmp-*
