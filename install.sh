@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # install.sh - Instalador de deepseek-check
+# Autor: manuti <manuti@gmail.com>
 #
 # Copia el script a ~/.local/bin (o $PREFIX/bin en Termux) y añade el
 # aviso de estado al .bashrc / .zshrc para que se muestre al abrir la

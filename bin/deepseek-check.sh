@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # deepseek-check.sh - Checks whether it is off-peak time for DeepSeek
+# Author: manuti <manuti@gmail.com>
 #
 # Usage:
 #   deepseek-check                Shows the status (0 = off-peak, 1 = peak)

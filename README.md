@@ -206,6 +206,10 @@ deepseek-offpeak-checker/
 - Página oficial de precios de DeepSeek: <https://api-docs.deepseek.com/quick_start/pricing/>
 - Artículo sobre el uso en horas valle (inspiración): <https://deepakness.com/deepseek>
 
+## 👤 Autor
+
+**manuti** — <manuti@gmail.com>
+
 ## 📝 Licencia
 
 [MIT](LICENSE)
